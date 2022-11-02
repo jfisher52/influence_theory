@@ -1,0 +1,32 @@
+# Config file to find approximated MIS on zsRE using arnoldi method (run_MIS_exp.py)
+results_dir: "results/zsre/MIS/"
+hyperparam_search: False
+task: "zsre"
+device: cuda:3
+n: 4499 # either "all" = all data or an integer < len(train_data)
+n_test: 100 # either "all" = all data or an integer < len(test_data)
+approx_method: arnoldi
+tr_bsz: 4
+te_bsz: 32
+iterations: 1
+alpha: .05
+
+# Model parameters
+dropout: 0.0
+no_grad_layers: null
+half: False
+model_seed: 0
+data_seed: 1
+single_batch: False
+
+# Method parameters
+method:
+  arnoldi:
+    n_it: 50
+    lambda1: 100
+    top_k: 10
+
+
+
+
+

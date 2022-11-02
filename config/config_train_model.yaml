@@ -1,0 +1,25 @@
+# Config file to finetune base model on zsRE or WikiText (run_train_model.py)
+results_dir: "/models/zsre"
+saved_model_dir: "/models/zsre"
+hyperparam_search: False
+task: "zsre"
+iterations: 20
+n: 743 # either "all" = all data or an integer < len(train_data)
+n_test: 200 # either "all" = all data or an integer < len(test_data)
+batch_size: 16
+device: cuda:0
+
+# Model parameters
+dropout: 0.0
+no_grad_layers: null
+half: False
+model_seed: 0
+data_seed: 1
+encoder_only: False
+single_batch: False
+data:
+  rephrase: True
+
+ft:
+  lr: 1e-6
+
