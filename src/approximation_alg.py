@@ -1,4 +1,5 @@
-# This document contains the four methods to approximate the IF
+"""This document contains the four methods to approximate the IF
+"""
 import torch
 from src.utils import avg_hvp, hvp_fn, multi_loss_fn, gather_flat_grad, epoch_loss
 import numpy as np
@@ -6,7 +7,7 @@ import logging
 
 
 # Conjugate Gradient
-def get_cg(x_init, it_max, target, train_data, model, lambda1, eps, device, task='zsre', loss_at_epoch = False, break_early=False):
+def conjugate_gradient(x_init, target, model, device, train_loader, lambda1, eps, it_max, task='zsre', loss_at_epoch=False, break_early=False):
     """Applies conjugate gradient algorithm.
     Args:
         x_init: Initial guess.
@@ -23,17 +24,17 @@ def get_cg(x_init, it_max, target, train_data, model, lambda1, eps, device, task
     x = x_init
     i = 0
     residual = [t-h - lambda1*x0 for t, h,
-                x0 in zip(target, avg_hvp(train_data, model, x,  device, break_early), x)]
+                x0 in zip(target, avg_hvp(train_loader, model, x,  device, break_early), x)]
     direction = residual
     deltanew = sum([torch.dot(torch.flatten(r), torch.flatten(r))
                    for r in residual])
     delta0 = deltanew
     while i < it_max and deltanew > eps ** 2 * delta0:
         alpha = deltanew / sum([torch.dot(torch.flatten(d), torch.flatten(h + lambda1*d))
-                               for d, h in zip(direction, avg_hvp(train_data, model, direction, device, break_early))])
+                               for d, h in zip(direction, avg_hvp(train_loader, model, direction, device, break_early))])
         x = [a + alpha*d for a, d in zip(x, direction)]
         residual = [t-h - lambda1*x0 for t, h,
-                    x0 in zip(target, avg_hvp(train_data, model, x, device, break_early), x)]
+                    x0 in zip(target, avg_hvp(train_loader, model, x, device, break_early), x)]
         deltaold = deltanew
         deltanew = sum([torch.dot(torch.flatten(r), torch.flatten(r))
                        for r in residual])
@@ -42,18 +43,17 @@ def get_cg(x_init, it_max, target, train_data, model, lambda1, eps, device, task
         i = i+1
         if loss_at_epoch:
             epoch_loss_val = epoch_loss(
-                x, train_data, model, device, target, lambda1, task=task)
+                x, train_loader, model, device, target, lambda1, task=task)
             loss.append(epoch_loss_val)
         logging.info(f"Iterations Completed: {i}")
     # track loss
-    loss.append(epoch_loss(x, train_data, model, device, target, lambda1, task=task))
+    loss.append(epoch_loss(x, train_loader, model,
+                device, target, lambda1, task=task))
 
     return gather_flat_grad(x), loss
 
 # Stochastic Gradient Descent
-
-
-def get_sgd(target, model, device, train_loader, lr, lambda1, num_epochs, task='zsre', loss_at_epoch=False, break_early=False):
+def sgd(target, model, device, train_loader,  lambda1, lr, num_epochs, task='zsre', loss_at_epoch=False, break_early=False):
     """Applies stochastic gradient descent algorithm.
     Args:
         target: Vector multiplied by inverse hessian (gradient of loss at the point of interest).
@@ -82,13 +82,13 @@ def get_sgd(target, model, device, train_loader, lr, lambda1, num_epochs, task='
                 x, train_loader, model, device, target, lambda1, task=task)
             loss.append(epoch_loss_val)
         logging.info(f"Epochs Completed: {ep}")
-    loss_total = epoch_loss(x, train_loader, model, device, target, lambda1, task=task)
+    loss_total = epoch_loss(x, train_loader, model,
+                            device, target, lambda1, task=task)
     loss.append(loss_total)
     return gather_flat_grad(x), loss
 
-
 # Arnoldi
-def arnoldi_iter(start_vector, n_iters, lambda1, device, train_dataloader, model, verbose=True, norm_constant=1.0, stop_tol=1e-6):
+def arnoldi_iter(start_vector, model, device, train_loader, lambda1, n_iters, verbose=True, norm_constant=1.0, stop_tol=1e-6):
     """Applies Arnoldi's algorithm.
     Args:
         start_vector: Initial guess.
@@ -121,7 +121,7 @@ def arnoldi_iter(start_vector, n_iters, lambda1, device, train_dataloader, model
         for i, p in enumerate(proj[n]):
             proj[n][i] = p.to(device)
         vec = [h + lambda1*p for h,
-               p in zip(avg_hvp(train_dataloader, model, proj[n], device), proj[n])]
+               p in zip(avg_hvp(train_loader, model, proj[n], device), proj[n])]
         for i, p in enumerate(proj[n]):
             proj[n][i] = p.to('cpu')
         for i, v in enumerate(vec):
@@ -254,7 +254,7 @@ def compute_influence_on_loss(gradient, test_gradient, eigvals, eigvecs):
 
 
 # SVRG
-def get_svrg(target, model, device, train_loader, lambda1, lr, num_epochs, task='zsre', loss_at_epoch=False):
+def variance_reduction(target, model, device, train_loader, lambda1, lr, num_epochs, task='zsre', loss_at_epoch=False):
     """Applies stochastic variance reduction gradient (svrg) algorithm.
     Args:
         target: Vector multiplied by inverse hessian (gradient of loss of the point of interest).
@@ -292,6 +292,7 @@ def get_svrg(target, model, device, train_loader, lambda1, lr, num_epochs, task=
             loss.append(epoch_loss_val)
             print(epoch_loss_val)
         logging.info(f"Epochs Completed: {ep}")
-    loss_total = epoch_loss(X, train_loader, model, device, target, lambda1, task=task)
+    loss_total = epoch_loss(X, train_loader, model,
+                            device, target, lambda1, task=task)
     loss.append(loss_total)
     return gather_flat_grad(X), loss

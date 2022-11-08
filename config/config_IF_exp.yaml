@@ -1,4 +1,5 @@
-# Config file to find approximated IF using certain approximation method (run_IF_exp.py)
+"""Config file to find approximated IF using certain approximation method (run_IF_exp.py)
+"""
 results_dir: "/results/zsre"
 hyperparam_search: False
 break_early: False # Use if you want to run less than one epoch
@@ -13,33 +14,26 @@ iterations: 1
 
 # Model parameters
 dropout: 0.0
-no_grad_layers: null
-half: False
 model_seed: 0
 data_seed: 1
-single_batch: False
+
 
 # Method parameters
 method:
+  lambda1: 100
+  loss_at_epoch: False
   cgd:
     it_max: 100
     eps: .01
-    lambda1: 100
-    loss_at_epoch: False
   sgd:
     lr: 5e-4
-    lambda1: 100
     num_epochs: 50
-    loss_at_epoch: False
   arnoldi:
     n_it: 30
-    lambda1: 100
     top_k: 30
   svrg:
-    l2reg: 100
     lr: 5e-4
     num_epochs: 25
-    loss_at_epoch: False
 
 
 

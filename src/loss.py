@@ -1,4 +1,5 @@
-# This file calculates different types of loss
+"""This file calculates different types of loss
+"""
 import torch
 import numpy as np
 

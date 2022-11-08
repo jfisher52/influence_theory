@@ -13,11 +13,8 @@ alpha: .05
 
 # Model parameters
 dropout: 0.0
-no_grad_layers: null
-half: False
 model_seed: 0
 data_seed: 1
-single_batch: False
 
 # Method parameters
 method:

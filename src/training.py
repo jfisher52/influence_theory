@@ -1,11 +1,12 @@
-# Function used to finetune base models
+"""Function used to finetune base models
+"""
 import copy
 import time
 import torch
 import logging
 from src.data_zsre import create_dataloader
 from src.loss import multi_loss_fn
-from src.eval import evaluate_models_fn
+from src.evaluate import evaluate_models_fn
 
 
 def training(args, model_original, tokenizer, train_data, test_data, base_dir, lr=1e-4):

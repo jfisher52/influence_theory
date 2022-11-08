@@ -1,5 +1,6 @@
-# This file finetunes a base model on a subset of data.
-# Can be used for BART base/zsRE or Distil GPT2/WikiText
+"""This file finetunes a base model on a subset of data.
+Can be used for BART base/zsRE or Distil GPT2/WikiText
+"""
 import hydra
 from pathlib import Path
 from omegaconf import OmegaConf
@@ -10,7 +11,7 @@ import os
 import logging
 import transformers
 from src.utils import get_tokenizer, get_model
-from src.ft_training import training
+from src.training import training
 from src.data_zsre import extract_data_zsre
 from src.data_wiki import extract_data_wiki
 
@@ -23,7 +24,7 @@ os.chdir(cwd)
 OmegaConf.register_new_resolver("uuid", lambda: utils.uuid())
 
 
-@hydra.main(config_path='config', config_name='train_model')
+@hydra.main(config_path='config', config_name='config_train_model')
 def run(config):
     logging.info(f"Configuration: {config}")
     base_dir = hydra.utils.get_original_cwd()

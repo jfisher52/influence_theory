@@ -11,14 +11,8 @@ device: cuda:0
 
 # Model parameters
 dropout: 0.0
-no_grad_layers: null
-half: False
 model_seed: 0
 data_seed: 1
-encoder_only: False
-single_batch: False
-data:
-  rephrase: True
 
 ft:
   lr: 1e-6

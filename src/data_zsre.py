@@ -1,4 +1,5 @@
-# This file support run_train_model.py, run_IF_exp.py, and run_MIS_exp.py
+"""This file support run_train_model.py, run_IF_exp.py, and run_MIS_exp.py
+"""
 import json
 import random
 import torch

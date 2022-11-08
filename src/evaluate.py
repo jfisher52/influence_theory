@@ -1,4 +1,5 @@
-# Evaluates both loss and accuracy
+"""This file support evaluates both loss and accuracy over many batches
+"""
 from regex import F
 from src.loss import loss_acc_batch_fn
 import torch

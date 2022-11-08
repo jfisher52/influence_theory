@@ -1,4 +1,5 @@
-# This file runs influence function approximation for each method using zsRE or WikiText data
+"""This file runs influence function approximation for each method using zsRE or WikiText data
+"""
 import os
 import logging
 import transformers
@@ -12,7 +13,7 @@ from src.utils import get_tokenizer, get_model, create_dataloader, avg_grad, arn
 from src.data_zsre import extract_data_zsre
 from src.data_wiki import extract_data_wiki
 from src.loss import multi_loss_fn
-from src.approx_alg import get_cg, get_sgd, arnoldi_iter, distill, get_svrg, compute_influence_on_loss
+from src.approximation_alg import conjugate_gradient, sgd, arnoldi_iter, distill, variance_reduction, compute_influence_on_loss
 
 
 # Set directoryP
@@ -70,8 +71,8 @@ def run(config):
     if config.approx_method == 'arnoldi':
         start_vector = [torch.randn_like(v).cpu()
                         for v in model_original.parameters()]
-        result = arnoldi_iter(start_vector, config.method.arnoldi.n_it, config.method.arnoldi.lambda1,
-                              config.device, train_dataloader, model_original, verbose=False)
+        result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.lambda1, config.method.arnoldi.n_it,
+                              verbose=False)
         eigvals, eigvecs = distill(
             result, config.method.arnoldi.top_k, verbose=False)
 
@@ -83,8 +84,8 @@ def run(config):
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
             grad_loss_removed_pt = torch.autograd.grad(
                 loss_removed_pt, model_original.parameters())
-            IF, loss_results_1run = get_cg(z_lst, config.method.cgd.it_max, grad_loss_removed_pt, train_dataloader, model_original,
-                                           config.method.cgd.lambda1, config.method.cgd.eps, config.device, config.task, config.method.cgd.loss_at_epoch, config.break_early)
+            IF, loss_results_1run = conjugate_gradient(z_lst,  grad_loss_removed_pt, model_original, config.device, train_dataloader,
+                                                       config.method.lambda1, config.method.cgd.eps, config.method.cgd.it_max, config.task, config.method.loss_at_epoch, config.break_early)
         elif config.approx_method == 'arnoldi':
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
             grad_loss_removed_pt = torch.autograd.grad(
@@ -95,14 +96,14 @@ def run(config):
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
             grad_loss_removed_pt = torch.autograd.grad(
                 loss_removed_pt, model_original.parameters())
-            IF, loss_results_1run = get_svrg(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.svrg.l2reg,
-                                             config.method.svrg.lr, config.method.svrg.num_epochs, config.task, config.method.svrg.loss_at_epoch)
+            IF, loss_results_1run = variance_reduction(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.svrg.l2reg,
+                                                       config.method.svrg.lr, config.method.svrg.num_epochs, config.task, config.method.loss_at_epoch)
         elif config.approx_method == 'sgd':
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
             grad_loss_removed_pt = torch.autograd.grad(
                 loss_removed_pt, model_original.parameters())
-            IF, loss_results_1run = get_sgd(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.sgd.lr,
-                                            config.method.sgd.lambda1, config.method.sgd.num_epochs, config.task, config.method.sgd.loss_at_epoch, config.break_early)
+            IF, loss_results_1run = sgd(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.lambda1,
+                                        config.method.sgd.lr, config.method.sgd.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
         else:
             logging.error("Approximation Method is Invalid")
             break
@@ -133,7 +134,7 @@ def run(config):
     if config.approx_method == "arnoldi":
         results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.arnoldi.n_it}.pt"
     elif config.approx_method == "sgd":
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.sgd.num_epochs}_{config.method.sgd.lambda1}.pt"
+        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.sgd.num_epochs}_{config.method.lambda1}.pt"
     elif config.approx_method == "svrg":
         results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.svrg.num_epochs}.pt"
     else:

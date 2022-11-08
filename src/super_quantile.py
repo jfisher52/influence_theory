@@ -1,9 +1,7 @@
-# From the SQwash API (https://krishnap25.github.io/sqwash/)
-# Used to calculate most influential subset (MIS), run_MIS_exp.py
-"""Functional API for superquantile-based reducers.
-
-.. moduleauthor:: Krishna Pillutla
+"""From the SQwash API (https://krishnap25.github.io/sqwash/)
+    Used to calculate most influential subset (MIS), run_MIS_exp.py
 """
+
 import torch
 
 
