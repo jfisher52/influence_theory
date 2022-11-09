@@ -9,8 +9,8 @@ import random
 import hydra
 from omegaconf import OmegaConf
 from pathlib import Path
-from src.loss import multi_loss_fn
-from src.super_quantile import reduce_superquantile
+from src.loss_functions import multi_loss_fn
+from src.superquantile import reduce_superquantile
 from src.utils import get_tokenizer, get_model, create_dataloader
 from src.data_zsre import extract_data_zsre, Create_dataset
 from src.approximation_alg import arnoldi_iter, distill, compute_influence_on_loss
@@ -41,8 +41,7 @@ def run(config):
     # Load model and tokenizer
     tokenizer = get_tokenizer(
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
-    model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt,
-                               config.dropout, config.model.inner_params, config.no_grad_layers, base_dir, config.half).to(config.device)
+    model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
 
     # Download zsRE data set
     logging.info("Create train/test datasets")
@@ -74,7 +73,7 @@ def run(config):
     # Compute eigenvalues and eigenvectors
     start_vector = [torch.randn_like(v).cpu()
                     for v in model_original.parameters()]
-    result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.arnoldi.lambda1, config.method.arnoldi.n_it,
+    result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.arnoldi.n_it,
                           verbose=False)
     eigvals, eigvecs = distill(
         result, config.method.arnoldi.top_k, verbose=False)

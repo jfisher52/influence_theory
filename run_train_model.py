@@ -39,15 +39,13 @@ def run(config):
     logging.info("Load Original Model")
     tokenizer = get_tokenizer(
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
-    model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt,
-                            config.dropout, config.model.inner_params, config.no_grad_layers, config.half).to(config.device)
+    model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
     if config.task == 'wiki':
         # Adding padding to tokenizer
         tokenizer.add_special_tokens({'pad_token': '[PAD]'})
         model_original.resize_token_embeddings(len(tokenizer))
         model_original.transformer.wte.weight.data[-1] = model_original.transformer.wte.weight.data.mean(
             0)
-
     # Download train/test data
     if config.task == "zsre":
         train_data, test_data = extract_data_zsre(
