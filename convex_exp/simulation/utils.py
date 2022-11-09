@@ -42,7 +42,7 @@ def if_diff_sim_lin(dim, x_sim, y_sim, oracle_theta_dict, lambda_, n, n_sim, see
         if_pop_ls.append(if_pop(dim, x_con, y_con, oracle_theta, lambda_))
     return (if_emp_ls, if_pop_ls)
 
-# run simulations for different data size n
+# Run simulations for different data size n
 def run_sim_lin(n_sim, eps, n_ls, lambda_ls, oracle_theta_dict, dim, seed, theta_star, if_emp, if_pop):
     mean_diff_abs_total = []
     sd_diff_abs_total = []
@@ -100,7 +100,7 @@ def if_diff_sim_log(dim, x_sim, y_sim, x_pop, y_pop, n_sim, rng, theta_star, emp
         if_pop_ls.append(if_pop)
     return (if_emp_ls, if_pop_ls, H_pop)
 
-# run simulations for different data size n
+# Run simulations for different data size n
 def run_sim_log(dim, eps, n_pop, n_ls, n_sim, emp_if_fn, theta_star):
     mean_diff_abs_total = []
     sd_diff_abs_total = []
