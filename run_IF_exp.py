@@ -31,6 +31,7 @@ def run(config):
 
     logging.info(f"Configuration: {config}")
     base_dir = hydra.utils.get_original_cwd()
+    # base_dir = "/home/jrfish/nlp/AISTAT_2022_InfuenceFunction_original"
     logging.info(f"Project base directory: {base_dir}")
 
     # Set seed for reproducibility
@@ -64,13 +65,28 @@ def run(config):
     # Removed data
     # Only want to use 1 removed point at a time
     removed_dataloader = create_dataloader(train_data, 1)
+#-------------------------------------------------------------
+#     from src.utils import avg_grad
+#     param_influence = list(model_original.parameters())
+# #Loss over test set
+#     model_original.zero_grad()
+#     # test_loss = loss(test_dataloader,model_original,config.device)
+#     # test_grads = torch.autograd.grad(test_loss, param_influence)
+#     test_grads = avg_grad(test_dataloader, model_original,config.device, param_influence,config.task)
+#     if config.approx_method == 'cgd':
+#         # compute H^{-1} test_grad instead; deterministic method
+#         z_lst = [torch.zeros_like(v) for v in model_original.parameters()]
+#         IF, loss_results_1run = conjugate_gradient(z_lst, test_grads, model_original, config.device, 
+#                             train_dataloader, config.regularization_param, config.method.conjugate_grad.eps,
+#                             config.method.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
 
+#-----------------------------------------------------------------------------------------------------
     # Get eigenvalues and eignevectors if using Arnoldi approx (only need to find this once)
-    logging.info("Start Approximation Calculations")
+    logging.info("Start Eigenvalue/Eigenvector Calculations for Arnoldi Method")
     if config.approx_method == 'arnoldi':
         start_vector = [torch.randn_like(v).cpu()
                         for v in model_original.parameters()]
-        result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.arnoldi.n_it,
+        result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.num_epochs,
                               verbose=False)
         eigvals, eigvecs = distill(
             result, config.method.arnoldi.top_k, verbose=False)
@@ -84,7 +100,7 @@ def run(config):
             grad_loss_removed_pt = torch.autograd.grad(
                 loss_removed_pt, model_original.parameters())
             IF, loss_results_1run = conjugate_gradient(z_lst,  grad_loss_removed_pt, model_original, config.device, train_dataloader,
-                                                       config.method.regularization_param, config.method.conjugate_grad.eps, config.method.conjugate_grad.it_max, config.task, config.method.loss_at_epoch, config.break_early)
+                                                       config.method.regularization_param, config.method.conjugate_grad.eps, config.method.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
         elif config.approx_method == 'arnoldi':
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
             grad_loss_removed_pt = torch.autograd.grad(
@@ -95,17 +111,24 @@ def run(config):
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
             grad_loss_removed_pt = torch.autograd.grad(
                 loss_removed_pt, model_original.parameters())
-            IF, loss_results_1run = variance_reduction(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.svrg.l2reg,
-                                                       config.method.svrg.lr, config.method.svrg.num_epochs, config.task, config.method.loss_at_epoch)
+            IF, loss_results_1run = variance_reduction(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.regularization_param,
+                                                       config.method.lr, config.method.num_epochs, config.task, config.method.loss_at_epoch)
         elif config.approx_method == 'sgd':
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
             grad_loss_removed_pt = torch.autograd.grad(
                 loss_removed_pt, model_original.parameters())
             IF, loss_results_1run = sgd(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.regularization_param,
-                                        config.method.sgd.lr, config.method.sgd.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
+                                        config.method.lr, config.method.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
         else:
             logging.error("Approximation Method is Invalid")
             break
+    # ----------------------------------------------
+    #     if config.approx_method == "cgd":
+    #         print("Using precomputed inf for CG")
+    #         loss_removed_pt = multi_loss_fn(model_original,rd, task="wiki")
+    #         grad_loss_removed_pt = torch.autograd.grad(loss_removed_pt, model_original.parameters())
+    #         influence = torch.dot(IF, gather_flat_grad(grad_loss_removed_pt)).item()
+    #-------------------------------------------
         logging.info(f"Iterations Completed: {count}")
         # Compute IF over test set
         param_influence = list(model_original.parameters())
@@ -131,11 +154,11 @@ def run(config):
     # Save Results
     results_dir = base_dir+config.results_dir
     if config.approx_method == "arnoldi":
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.arnoldi.n_it}.pt"
+        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_it}.pt"
     elif config.approx_method == "sgd":
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.sgd.num_epochs}_{config.method.regularization_param}.pt"
+        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_epochs}_{config.method.regularization_param}.pt"
     elif config.approx_method == "svrg":
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.svrg.num_epochs}.pt"
+        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_epochs}.pt"
     else:
         results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}.pt"
     torch.save(results, results_path)
