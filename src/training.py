@@ -5,7 +5,7 @@ import time
 import torch
 import logging
 from src.data_zsre import create_dataloader
-from src.loss import multi_loss_fn
+from src.loss_functions import multi_loss_fn
 from src.evaluate import evaluate_models_fn
 
 
@@ -47,10 +47,10 @@ def training(args, model_original, tokenizer, train_data, test_data, base_dir, l
                     tokenizer, train_data, test_data))
         if args.task == "zsre":
             print(
-                f"Epoch {epoch+1}\t{logs[-1]['loss_train']:.2f}\t{logs[-1]['loss_test']:.2f}\t{logs[-1]['acc_train']:.2f}\t{logs[-1]['acc_test']:.2f}\t{time.time() - t1:.2f}")
+                f"Epoch {epoch+1}\t{logs[-1]['loss_train']:.2f}\t{logs[-1]['loss_test']:.2f}\t{time.time() - t1:.2f}")
         if args.task == "wiki":
             print(
-                f"Epoch {epoch+1}\t{logs[-1]['loss_train']:.2f}\t{logs[-1]['loss_test']:.2f}\t{logs[-1]['perpl_train']:.2f}\t{logs[-1]['perpl_test']:.2f}\t{time.time() - t1:.2f}")
+                f"Epoch {epoch+1}\t{logs[-1]['loss_train']:.2f}\t{logs[-1]['loss_test']:.2f}\t{time.time() - t1:.2f}")
 
     # Save Final Model
     torch.save(model_ft.state_dict(), base_dir+args.results_dir+"/model_" +

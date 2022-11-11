@@ -27,9 +27,15 @@ class Create_dataset(torch.utils.data.Dataset):
         if (ids[:, 0] == self.tok.pad_token_id).any():
             raise ValueError("Left-padding not supported for GPT2")
 
-    def get_labels(self, ids):
+    def get_edit_labels(self, ids):
         self._check_padding(ids)
-        return ids.masked_fill(ids == self.tok.pad_token_id, -100)
+
+        labels = ids.clone()
+        end_idxs = (labels != self.tok.pad_token_id).sum(-1)
+        for batch_idx, end_idx in enumerate(end_idxs):
+            labels[batch_idx, :end_idx - self.n_tokens] = -100
+        labels[labels == self.tok.pad_token_id] = -100
+        return labels
 
     def __getitem__(self, idx):
         data_inner = {}
@@ -39,9 +45,9 @@ class Create_dataset(torch.utils.data.Dataset):
         return dict_to(data_inner, self.config.device)
 
     def _tokenize(self, data_inpt):
-        tok_inpt = self.tok(
-            data_inpt, padding=True, return_tensors="pt", truncation=False, max_length=100)
-        tok_inpt['labels'] = self.get_labels(tok_inpt["input_ids"])
+        tok_inpt=self.tok(data_inpt, padding=True, return_tensors="pt",truncation=False, max_length=100)
+        tok_inpt['labels'] = self.get_edit_labels(tok_inpt["input_ids"])
+
         dataset = []
         keys = ['inpt_input_ids', 'inpt_attention_mask', 'labels']
         for ii, iam, lb in zip(tok_inpt['input_ids'], tok_inpt['attention_mask'], tok_inpt['labels']):

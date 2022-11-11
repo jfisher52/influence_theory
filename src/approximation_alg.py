@@ -7,33 +7,34 @@ import logging
 
 
 # Conjugate Gradient
-def conjugate_gradient(x_init, target, model, device, train_loader, lambda1, eps, it_max, task='zsre', loss_at_epoch=False, break_early=False):
+def conjugate_gradient(x_init, target, model, device, train_loader, regularization_param, eps, it_max, task='zsre', loss_at_epoch=False, break_early=False):
     """Applies conjugate gradient algorithm.
     Args:
         x_init: Initial guess.
         it_max: Maximum number of iterations.
-        lambda1: Constant value for the norm of each iteration.
+        regularization_param: Constant value for the norm of each iteration.
         target: Vector multiplied by inverse hessian (gradient of loss at the point of interest).
         eps: Tolerance used to detect early termination.
     Returns:
         The result of the conjugate gradient iteration, resulting in an approximation for H^{-1}(target).
     """
+    logging.info(f"Max Iterations: {it_max}")
     logging.info(f"Epsilon: {eps}")
-    logging.info(f"lambda1: {lambda1}")
+    logging.info(f"regularization_param: {regularization_param}")
     loss = []
     x = x_init
     i = 0
-    residual = [t-h - lambda1*x0 for t, h,
+    residual = [t-h - regularization_param*x0 for t, h,
                 x0 in zip(target, avg_hvp(train_loader, model, x,  device, break_early), x)]
     direction = residual
     deltanew = sum([torch.dot(torch.flatten(r), torch.flatten(r))
                    for r in residual])
     delta0 = deltanew
     while i < it_max and deltanew > eps ** 2 * delta0:
-        alpha = deltanew / sum([torch.dot(torch.flatten(d), torch.flatten(h + lambda1*d))
+        alpha = deltanew / sum([torch.dot(torch.flatten(d), torch.flatten(h + regularization_param*d))
                                for d, h in zip(direction, avg_hvp(train_loader, model, direction, device, break_early))])
         x = [a + alpha*d for a, d in zip(x, direction)]
-        residual = [t-h - lambda1*x0 for t, h,
+        residual = [t-h - regularization_param*x0 for t, h,
                     x0 in zip(target, avg_hvp(train_loader, model, x, device, break_early), x)]
         deltaold = deltanew
         deltanew = sum([torch.dot(torch.flatten(r), torch.flatten(r))
@@ -43,17 +44,17 @@ def conjugate_gradient(x_init, target, model, device, train_loader, lambda1, eps
         i = i+1
         if loss_at_epoch:
             epoch_loss_val = epoch_loss(
-                x, train_loader, model, device, target, lambda1, task=task)
+                x, train_loader, model, device, target, regularization_param, task=task)
             loss.append(epoch_loss_val)
         logging.info(f"Iterations Completed: {i}")
     # track loss
     loss.append(epoch_loss(x, train_loader, model,
-                device, target, lambda1, task=task))
+                device, target, regularization_param, task=task))
 
     return gather_flat_grad(x), loss
 
 # Stochastic Gradient Descent
-def sgd(target, model, device, train_loader,  lambda1, lr, num_epochs, task='zsre', loss_at_epoch=False, break_early=False):
+def sgd(target, model, device, train_loader,  regularization_param, lr, num_epochs, task='zsre', loss_at_epoch=False, break_early=False):
     """Applies stochastic gradient descent algorithm.
     Args:
         target: Vector multiplied by inverse hessian (gradient of loss at the point of interest).
@@ -63,6 +64,9 @@ def sgd(target, model, device, train_loader,  lambda1, lr, num_epochs, task='zsr
     Returns:
         The result of the stochastic gradient descent iteration, resulting in an approximation for H^{-1}(target).
     """
+    logging.info(f"Number of Epochs: {num_epochs}")
+    logging.info(f"Learning Rate: {lr}")
+    logging.info(f"regularization_param: {regularization_param}")
     x = [torch.zeros_like(p) for p in model.parameters()]
     loss = []
     for ep in range(num_epochs):
@@ -70,7 +74,7 @@ def sgd(target, model, device, train_loader,  lambda1, lr, num_epochs, task='zsr
             model.zero_grad()
             train_loss = multi_loss_fn(model, batch, task)
             hvp = hvp_fn(model, train_loss, x)
-            x = [xt - (lr*(Hxt + lambda1*xt - v0))
+            x = [xt - (lr*(Hxt + regularization_param*xt - v0))
                  for Hxt, xt, v0 in zip(hvp, x, target)]
             if (j % 200 == 0):
                 print("Recursion at depth %s: norm is %f" % (
@@ -79,16 +83,16 @@ def sgd(target, model, device, train_loader,  lambda1, lr, num_epochs, task='zsr
                 break
         if loss_at_epoch:
             epoch_loss_val = epoch_loss(
-                x, train_loader, model, device, target, lambda1, task=task)
+                x, train_loader, model, device, target, regularization_param, task=task)
             loss.append(epoch_loss_val)
         logging.info(f"Epochs Completed: {ep}")
     loss_total = epoch_loss(x, train_loader, model,
-                            device, target, lambda1, task=task)
+                            device, target, regularization_param, task=task)
     loss.append(loss_total)
     return gather_flat_grad(x), loss
 
 # Arnoldi
-def arnoldi_iter(start_vector, model, device, train_loader, lambda1, n_iters, verbose=True, norm_constant=1.0, stop_tol=1e-6):
+def arnoldi_iter(start_vector, model, device, train_loader, regularization_param, n_iters, verbose=True, norm_constant=1.0, stop_tol=1e-6):
     """Applies Arnoldi's algorithm.
     Args:
         start_vector: Initial guess.
@@ -120,7 +124,7 @@ def arnoldi_iter(start_vector, model, device, train_loader, lambda1, n_iters, ve
                 print('Starting Arnoldi iteration:', n)
         for i, p in enumerate(proj[n]):
             proj[n][i] = p.to(device)
-        vec = [h + lambda1*p for h,
+        vec = [h + regularization_param*p for h,
                p in zip(avg_hvp(train_loader, model, proj[n], device), proj[n])]
         for i, p in enumerate(proj[n]):
             proj[n][i] = p.to('cpu')
@@ -254,26 +258,28 @@ def compute_influence_on_loss(gradient, test_gradient, eigvals, eigvecs):
 
 
 # SVRG
-def variance_reduction(target, model, device, train_loader, lambda1, lr, num_epochs, task='zsre', loss_at_epoch=False):
+def variance_reduction(target, model, device, train_loader, regularization_param, lr, num_epochs, task='zsre', loss_at_epoch=False):
     """Applies stochastic variance reduction gradient (svrg) algorithm.
     Args:
         target: Vector multiplied by inverse hessian (gradient of loss of the point of interest).
-        lambda1: Constant value for the norm of each iteration.
+        regularization_param: Constant value for the norm of each iteration.
         lr: Learning rate.
         num_epochs: Number of epochs.
     Returns:
         The result of the svrg iteration, resulting in an approximation for H^{-1}(target).
     """
-
+    logging.info(f"Number of Epochs: {num_epochs}")
+    logging.info(f"Learning Rate: {lr}")
+    logging.info(f"regularization_param: {regularization_param}")
     def batch_gradient_fn(X):
         HX = avg_hvp(train_loader, model, X, device)
-        return [hx + lambda1 * x - v0 for (hx, x, v0) in zip(HX, X, target)]
+        return [hx + regularization_param * x - v0 for (hx, x, v0) in zip(HX, X, target)]
 
     def gradient_fn(batch, X):
         model.zero_grad()
         train_loss = multi_loss_fn(model, batch, task)
         HX = hvp_fn(model, train_loss, X)  # \hat H * x
-        return [hx + lambda1 * x - v0 for (hx, x, v0) in zip(HX, X, target)]
+        return [hx + regularization_param * x - v0 for (hx, x, v0) in zip(HX, X, target)]
 
     X = [torch.zeros_like(v0) for v0 in target]  # x
     loss = []
@@ -288,11 +294,11 @@ def variance_reduction(target, model, device, train_loader, lambda1, lr, num_epo
                  for (x, g, g0, bg) in zip(X, G, G0, batch_grad)]
         if loss_at_epoch:
             epoch_loss_val = epoch_loss(
-                X, train_loader, model, device, target, lambda1, task=task)
+                X, train_loader, model, device, target, regularization_param, task=task)
             loss.append(epoch_loss_val)
             print(epoch_loss_val)
         logging.info(f"Epochs Completed: {ep}")
     loss_total = epoch_loss(X, train_loader, model,
-                            device, target, lambda1, task=task)
+                            device, target, regularization_param, task=task)
     loss.append(loss_total)
     return gather_flat_grad(X), loss

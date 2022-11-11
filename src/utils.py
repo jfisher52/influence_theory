@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import re
 import logging
-from src.loss import multi_loss_fn
+from src.loss_functions import multi_loss_fn
 
 
 # --------------------Model and Tokenizer-------------------------------------------------------
@@ -14,19 +14,22 @@ def scr():
     scr_dir = "../src"
 
 
-def get_model(tokenizer, model_name, transformers, model_class_name, model_pt, dropout, model_inner_params, no_grad_layers, base_dir="", half=None):
+def get_model(tokenizer, model_name, transformers, model_class_name, model_pt, dropout, base_dir=""):
     ModelClass = getattr(transformers, model_class_name)
     logging.info(
         f"Loading model class {ModelClass} with name {model_name} from cache dir {scr()}")
-    model = ModelClass.from_pretrained(model_name, cache_dir=scr())
+    if model_class_name == "GPT2LMHeadModel":
+        model = ModelClass.from_pretrained(model_name, pad_token_id=tokenizer.eos_token_id, cache_dir=scr())
+    else: 
+        model = ModelClass.from_pretrained(model_name, cache_dir=scr())
 
     if model_pt is not None:
         logging.info(f"Loading model initialization from {model_pt}")
-        if model_class_name == "GPT2LMHeadModel":
-            # Adding padding to tokenizer
-            model.resize_token_embeddings(len(tokenizer))
-            model.transformer.wte.weight.data[-1] = model.transformer.wte.weight.data.mean(
-                0)
+        # if model_class_name == "GPT2LMHeadModel":
+        #     # Adding padding to tokenizer
+        #     model.resize_token_embeddings(len(tokenizer))
+        #     model.transformer.wte.weight.data[-1] = model.transformer.wte.weight.data.mean(
+        #         0)
         state_dict = torch.load(base_dir+model_pt, map_location="cpu")
 
         try:
@@ -152,14 +155,12 @@ def avg_hvp(data, model, multiplier, device, task='zsre', break_early=False):
             break
     return hvp_all
 
-# Epoch loss for SGD, SVRG, and CGD
-
-
-def epoch_loss(ihvp, train_loader, model, device, target, lambda1, task='zsre'):
-    # .5X^T H X + X^T lambda1 X - VX
+# Epoch loss for SGD, SVRG, and Conjugate Gradient
+def epoch_loss(ihvp, train_loader, model, device, target, regularization_param, task='zsre'):
+    # .5X^T H X + X^T regularization_param X - VX
     t1 = .5 * (torch.dot(gather_flat_grad(ihvp),
                gather_flat_grad(avg_hvp(train_loader, model, ihvp, device, task=task))))
-    t2 = .5 * lambda1 * \
+    t2 = .5 * regularization_param * \
         torch.dot(gather_flat_grad(ihvp), gather_flat_grad(ihvp))
     t3 = torch.dot(gather_flat_grad(target), gather_flat_grad(ihvp))
     loss = t1 + t2 - t3

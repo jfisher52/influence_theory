@@ -4,7 +4,6 @@ import json
 import random
 import torch
 import logging
-import torch
 from src.utils import dict_to
 
 # This class was altered from Mitchel et. al. (2022), MEND (https://github.com/eric-mitchell/mend;https://openreview.net/pdf?id=0DcZxeWfOPt)
@@ -87,7 +86,7 @@ def output_tok(input, model, tokenizer, config):
     for i in dataloader:
         batch = tokenizer(i, return_tensors="pt", padding=True,
                           truncation=True, max_length=40).to(config.device)
-        tok_batch = model.generate(batch["input_ids"], max_length=40)
+        tok_batch = batch['input_ids']
         # could make this smaller than (40)
         for one_batch in tok_batch:
             dim_pad = 40 - len(one_batch)

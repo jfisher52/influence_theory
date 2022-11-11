@@ -1,7 +1,6 @@
 """This file support evaluates both loss and accuracy over many batches
 """
-from regex import F
-from src.loss import loss_acc_batch_fn
+from src.loss_functions import loss_acc_batch_fn
 import torch
 import logging
 from collections import OrderedDict
