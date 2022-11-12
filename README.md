@@ -63,3 +63,31 @@ We used a subset of the data used in [Mitchell et. al. 2022]{https://openreview.
 **4. WikiText**
 
 This is a subset of the huggingface WikiText103 by [Merity et. al. 2016]{https://arxiv.org/abs/1609.07843}
+
+## Experimental Pipeline (Convex Experiments)
+Experiemental code for both of the simulations (linear and logisitic regression) and both of the economic experiments (Oregon Medicaid and Cash Transfer) can be found in the "convex_exp" folder. Each experiment is outlined in a juypter notebook and can be run by using the "Run All" function. Below is the folder location for each experiment.
+* Linear Regression: "convex exp"--> "simulation" --> "simulation_linear_exp.pdf"
+* Logistic Regression: "convex exp"--> "simulation" --> "simulation_logistic_exp.pdf"
+* Oregon Medicaid: "convex exp"--> "economic exp" --> "oregon_medicaid.pdf"
+* Cash Transfer: "convex exp"--> "simulation" --> "cash_transfer.pdf"
+
+## Experimental Pipeline (Non-Convex Experiments)
+For each dataset (zsRE and WikiText), the experimental pipeline is as follows:
+1. finetune the pretrained model on a range of subsets of the data
+2. compute the influence on a single test point using each of the four approximation method
+3. compute the Most Influencial Subset for five pre-selected test points using the Arnoldi method
+
+The creation of the finetune models (Step 1) must be run first. Other steps can proceed in any order.
+
+Here is how to find the scripts step-by-step for zsRE.
+
+**Step 1. Finetune the Models:**
+Create the folder `models/zsre` in the base directory. Then, run `scripts/train_model_zsre` to generate six models of Bart-base finetuned on a subset of the original data. 
+
+**Step 2. Approximated Influence of Single Point:**
+Create the folder `results/zsre` in the base directory. Then, run `scripts/IF_exp_zsre` to generate the approximated influence of a training point for five different points using conjugate gradients, SGD, SVRG, and the Arnoldi method.
+
+**Step 3. Approximated Most Influencial Subset:**
+Create the folder `results/zsre/MIS` in the base directory. Then, run `scripts/MIS_exp_zsre` to generate the approximated most influencial subsets for five pre-selected test points, found using the Arnoldi method.
+
+
