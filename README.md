@@ -79,7 +79,7 @@ For each dataset (zsRE and WikiText), the experimental pipeline is as follows:
 
 The creation of the finetune models (Step 1) must be run first. Other steps can proceed in any order.
 
-Here is how to find the scripts step-by-step for zsRE.
+Here is how to find the scripts step-by-step for zsRE. Repeat the below steps for WikiText by replacing "zsre" with "wiki". 
 
 **Step 1. Finetune the Models:**
 Create the folder `models/zsre` in the base directory. Then, run `scripts/train_model_zsre` to generate six models of Bart-base finetuned on a subset of the original data. 
@@ -90,4 +90,3 @@ Create the folder `results/zsre` in the base directory. Then, run `scripts/IF_ex
 **Step 3. Approximated Most Influencial Subset:**
 Create the folder `results/zsre/MIS` in the base directory. Then, run `scripts/MIS_exp_zsre` to generate the approximated most influencial subsets for five pre-selected test points, found using the Arnoldi method.
 
-Repeat the above steps for WikiText by replacing "zsre" with "wiki". 
