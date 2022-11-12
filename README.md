@@ -98,7 +98,7 @@ This should take about ???? hours for the zsRE experiment and ???? hours for Wik
 **Step 3. Approximated Most Influential Subset:**
 Create the folder `results/zsre/MIS` in the base directory. Then, run `scripts/MIS_exp_zsre` to generate the approximated most influential subsets for five pre-selected test points, found using the Arnoldi method.
 
-This script calculates the approximated influence of the Most Influencial Subset on the test set loss, at differing values of $\alpha$. We run this for 5 different training points over each of the four approximation methods outlined in the paper (conjugate gradients, SGD, SVRG, Arnoldi). All outputs will appear as `results/zsre/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_epochs}_{config.regularization_param}.pt"`.
+This script calculates the both the Most Influential Subset and the approximated influence of the Most Influencial Subset on the test set loss, at differing values of $\alpha$. We run this for 5 pre-selected test points and use the Arnoldi approximation. The Most Influential Subsets output to `results/zsre/results_MIS_{config.task}_{config.n}_{config.method.arnoldi.n_it}_{config.alpha}.pt"` and the approximated influence outputs to `results/zsre/results_MISinfluence_{config.task}_{config.n}_{config.method.num_epoch}_{config.alpha}.pt"`
 
 This should take about ??? hours for the zsRE experiment and ???? hours for WikiText experiment. 
 
