@@ -90,3 +90,11 @@ Create the folder `results/zsre` in the base directory. Then, run `scripts/IF_ex
 **Step 3. Approximated Most Influencial Subset:**
 Create the folder `results/zsre/MIS` in the base directory. Then, run `scripts/MIS_exp_zsre` to generate the approximated most influencial subsets for five pre-selected test points, found using the Arnoldi method.
 
+## Citation
+If you find this repository useful, or you use it in your research, please cite:
+```
+NEED TO ADD
+```
+    
+## Acknowledgements
+This work was supported by the Institute for Foundations of Data Science. ASK ZAID ABOUT OTHERS!!!!!
