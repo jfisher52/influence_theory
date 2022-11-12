@@ -18,18 +18,25 @@ The code is written in Python and the dependencies are:
 - scikit-learn >= 1.0.2
 
 **Conda Environment**:
-NEED HELP CREATING THIS....
 We recommend using a [conda environment](https://docs.conda.io/en/latest/miniconda.html)
 for Python 3.7.
 To setup the environment, run
 ```bash
 conda env create --file environment.yml
 # activate the environment
-conda activate mauve-experiments
+conda activate influence_theory
 ```
-In addition, you will have to install the following manually:
-- PyTorch, version 1.7: [instructions](https://pytorch.org/get-started/locally/),
-- HuggingFace Transformers, version 4.2.0: [instructions](https://huggingface.co/transformers).
-
-The code is compatible with PyTorch >= 1.1.0 and transformers >= 3.2.0 but
-we have not thoroughly tested it in this configuration.
+**Install Dependencies via Pip**:
+To install dependencies, run
+```bash
+pip install -r requirement.txt
+```
+## Datasets
+We used four different datasets, we outline them below. 
+**Convex Experiements**
+* Cash Transfer Experiement: This data is provided free by OPENICPSR and the American Economic Association. However, in order to download the data you must fill out a Terms of Use. Please download the file "table1.dta" by following the instrutions [here](https://www.openicpsr.org/openicpsr/project/113289/version/V1/view?path=/openicpsr/113289/fcr:versions/V1/table1.dta&type=file). Once downloaded, place the file under the folder "convex_exp"-->"data"-->"cash_transfer_data"
+Citation: Angelucci, Manuela, and De Giorgi, Giacomo. Replication data for: Indirect Effects of an Aid Program: How Do Cash Transfers Affect Ineligibles’ Consumption?: table1.dta. Nashville, TN: American Economic Association [publisher], 2009. Ann Arbor, MI: Inter-university Consortium for Political and Social Research [distributor], 2019-10-12. https://doi.org/10.3886/E113289V1-130527
+* Oregon Medicaid Experiment: This data is provided free by the National Bureau of Economic Research. However, it also requires each user to acknowledge a Terms of Use. Once downloaded extract the following data files from the downloaded zip file "oregon_puf.zip".
+  1. "OHIE_Public_Use_Files"--> "OHIE Data" --> "oregonhie_descriptive_vars.dta"
+  2. "OHIE_Public_Use_Files"--> "OHIE Data" --> "oregonhie_survey12m_vars.dta"
+Place both data files under the folder "convex_exp"-->"data"-->"oregon_data"
