@@ -35,7 +35,7 @@ pip install -r requirement.txt
 We used four different datasets, we outline them below. 
 ### Convex Experiements
 
-__Cash Transfer Experiement__ 
+</u>Cash Transfer Experiement</u>
 
 This data is provided free by OPENICPSR and the American Economic Association. However, in order to download the data you must fill out a Terms of Use. Please download the file "table1.dta" by following the instrutions [here](https://www.openicpsr.org/openicpsr/project/113289/version/V1/view?path=/openicpsr/113289/fcr:versions/V1/table1.dta&type=file). 
 
