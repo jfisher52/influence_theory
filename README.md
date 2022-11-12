@@ -33,7 +33,7 @@ pip install -r requirement.txt
 ```
 ## Datasets
 We used four different datasets, we outline them below. 
-**Convex Experiements**
+### Convex Experiements
 * Cash Transfer Experiement: This data is provided free by OPENICPSR and the American Economic Association. However, in order to download the data you must fill out a Terms of Use. Please download the file "table1.dta" by following the instrutions [here](https://www.openicpsr.org/openicpsr/project/113289/version/V1/view?path=/openicpsr/113289/fcr:versions/V1/table1.dta&type=file). 
 
 Once downloaded, place the file under the folder "convex_exp"-->"data"-->"cash_transfer_data"
@@ -47,7 +47,7 @@ Place both data files under the folder "convex_exp"-->"data"-->"oregon_data"
 
 Citation: Oregon Health Insurance Experiment Web Page is available at www.nber.org/oregon
 
-**Non-Convex Experiments (Language Model Experiements)**
+### Non-Convex Experiments (Language Model Experiements)
 All data can be downloaded by from this [Google Drive]{https://drive.google.com/drive/folders/10O8SPuWVR-1YrHf0U8amYR90FGg7EayF?usp=sharing}. Place all data files (7 total) in the "data" folder in the main directory.
 
 * Zero Shot Relations Extraction: We used a subset of the data used in [Mitchell et. al. 2022]{https://openreview.net/pdf?id=0DcZxeWfOPt}. The data was originally collected by [Levy et. al. 2017]{http://nlp.cs.washington.edu/zeroshot/} and split into train and test sets by [De Cao et al. (2021)]{https://arxiv.org/pdf/2104.08164.pdf}.
