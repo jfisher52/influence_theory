@@ -35,7 +35,7 @@ pip install -r requirement.txt
 We used four different datasets, we outline them below. 
 ### Convex Experiements
 
-</u>Cash Transfer Experiement</u>
+**1. Cash Transfer Experiement**
 
 This data is provided free by OPENICPSR and the American Economic Association. However, in order to download the data you must fill out a Terms of Use. Please download the file "table1.dta" by following the instrutions [here](https://www.openicpsr.org/openicpsr/project/113289/version/V1/view?path=/openicpsr/113289/fcr:versions/V1/table1.dta&type=file). 
 
@@ -43,7 +43,7 @@ Once downloaded, place the file under the folder "convex_exp"-->"data"-->"cash_t
 
 Citation: Angelucci, Manuela, and De Giorgi, Giacomo. Replication data for: Indirect Effects of an Aid Program: How Do Cash Transfers Affect Ineligibles’ Consumption?: table1.dta. Nashville, TN: American Economic Association [publisher], 2009. Ann Arbor, MI: Inter-university Consortium for Political and Social Research [distributor], 2019-10-12. https://doi.org/10.3886/E113289V1-130527
 
-**Oregon Medicaid Experiment**
+2.**Oregon Medicaid Experiment**
 
 This data is provided free by the National Bureau of Economic Research. However, it also requires each user to acknowledge a Terms of Use. Once downloaded extract the following data files from the downloaded zip file "oregon_puf.zip".
   1. "OHIE_Public_Use_Files"--> "OHIE Data" --> "oregonhie_descriptive_vars.dta"
@@ -56,5 +56,9 @@ Citation: Oregon Health Insurance Experiment Web Page is available at www.nber.o
 ### Non-Convex Experiments (Language Model Experiements)
 All data can be downloaded by from this [Google Drive]{https://drive.google.com/drive/folders/10O8SPuWVR-1YrHf0U8amYR90FGg7EayF?usp=sharing}. Place all data files (7 total) in the "data" folder in the main directory.
 
-* Zero Shot Relations Extraction: We used a subset of the data used in [Mitchell et. al. 2022]{https://openreview.net/pdf?id=0DcZxeWfOPt}. The data was originally collected by [Levy et. al. 2017]{http://nlp.cs.washington.edu/zeroshot/} and split into train and test sets by [De Cao et al. (2021)]{https://arxiv.org/pdf/2104.08164.pdf}.
-* WikiText: This is a subset of the huggingface WikiText103 by [Merity et. al. 2016]{https://arxiv.org/abs/1609.07843}
+**3.Zero Shot Relations Extraction**
+
+We used a subset of the data used in [Mitchell et. al. 2022]{https://openreview.net/pdf?id=0DcZxeWfOPt}. The data was originally collected by [Levy et. al. 2017]{http://nlp.cs.washington.edu/zeroshot/} and split into train and test sets by [De Cao et al. (2021)]{https://arxiv.org/pdf/2104.08164.pdf}.
+**4.WikiText**
+
+This is a subset of the huggingface WikiText103 by [Merity et. al. 2016]{https://arxiv.org/abs/1609.07843}
