@@ -44,3 +44,11 @@ Citation: Angelucci, Manuela, and De Giorgi, Giacomo. Replication data for: Indi
   2. "OHIE_Public_Use_Files"--> "OHIE Data" --> "oregonhie_survey12m_vars.dta"
 
 Place both data files under the folder "convex_exp"-->"data"-->"oregon_data"
+
+Citation: Oregon Health Insurance Experiment Web Page is available at www.nber.org/oregon
+
+**Non-Convex Experiments (Language Model Experiements)**
+All data can be downloaded by from this [Google Drive]{https://drive.google.com/drive/folders/10O8SPuWVR-1YrHf0U8amYR90FGg7EayF?usp=sharing}. Place all data files (7 total) in the "data" folder in the main directory.
+
+* Zero Shot Relations Extraction: We used a subset of the data used in [Mitchell et. al. 2022]{https://openreview.net/pdf?id=0DcZxeWfOPt}. The data was originally collected by [Levy et. al. 2017]{http://nlp.cs.washington.edu/zeroshot/} and split into train and test sets by [De Cao et al. (2021)]{https://arxiv.org/pdf/2104.08164.pdf}.
+* WikiText: This is a subset of the huggingface WikiText103 by [Merity et. al. 2016]{https://arxiv.org/abs/1609.07843}
