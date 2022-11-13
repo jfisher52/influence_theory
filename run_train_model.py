@@ -41,14 +41,10 @@ def run(config):
     logging.info("Load Original Model")
     tokenizer = get_tokenizer(
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
-    # tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-    tokenizer.pad_token = tokenizer.eos_token
+    if config.task == 'wiki':
+        tokenizer.pad_token = tokenizer.eos_token
     model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
-    # if config.task == 'wiki':
-    #     # Adding padding to tokenizer
-    #     model_original.resize_token_embeddings(len(tokenizer))
-    #     model_original.transformer.wte.weight.data[-1] = model_original.transformer.wte.weight.data.mean(
-    #         0)
+
     # Download train/test data
     if config.task == "zsre":
         train_data, test_data = extract_data_zsre(

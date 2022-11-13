@@ -40,12 +40,10 @@ def run(config):
     torch.manual_seed(config.model_seed)
 
     # Download original model and tokenizer
-    logging.info("Load Original Model")
     tokenizer = get_tokenizer(
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
     if config.task == 'wiki':
-        # Adding padding to tokenizer
-        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+        tokenizer.pad_token = tokenizer.eos_token
     model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
 
     # Download train/test data
@@ -153,14 +151,8 @@ def run(config):
             break
     # Save Results
     results_dir = base_dir+config.results_dir
-    if config.approx_method == "arnoldi":
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_it}.pt"
-    elif config.approx_method == "sgd":
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_epochs}_{config.method.regularization_param}.pt"
-    elif config.approx_method == "svrg":
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_epochs}.pt"
-    else:
-        results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}.pt"
+    results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_epochs}_{config.method.regularization_param}.pt"
+
     torch.save(results, results_path)
     print("Results outputed to: ", results_path)
 

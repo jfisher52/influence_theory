@@ -1,4 +1,4 @@
-name: influence_test2
+name: influence_theory
 channels:
   - conda-forge
   - anaconda

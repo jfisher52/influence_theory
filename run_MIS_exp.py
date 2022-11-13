@@ -41,6 +41,8 @@ def run(config):
     # Load model and tokenizer
     tokenizer = get_tokenizer(
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
+    if config.task == 'wiki':
+        tokenizer.pad_token = tokenizer.eos_token
     model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
 
     # Download zsRE data set
@@ -54,7 +56,7 @@ def run(config):
     # Handpicked testing points
     # Test_subset index's = [0, 7,8,12,18,24]
     te_raw_inpt = torch.load(
-        base_dir+"/data/zsre_selected_test_raw_inpt", map_location=config.device)
+        base_dir+"/data/zsre_selected_test_raw_inpt.pt", map_location=config.device)
     te_raw_pred = torch.load(
         base_dir+"/data/zsre_selected_test_raw_pred", map_location=config.device)
     te_tok_pred = torch.load(
@@ -73,7 +75,7 @@ def run(config):
     # Compute eigenvalues and eigenvectors
     start_vector = [torch.randn_like(v).cpu()
                     for v in model_original.parameters()]
-    result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.arnoldi.n_it,
+    result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.num_epoch,
                           verbose=False)
     eigvals, eigvecs = distill(
         result, config.method.arnoldi.top_k, verbose=False)
@@ -112,9 +114,9 @@ def run(config):
 
 # Save Results
     results_dir = base_dir+config.results_dir
-    results_path_infl = f"{results_dir}/results_infl_{config.task}_{config.n}_{config.method.arnoldi.n_it}_{config.alpha}.pt"
+    results_path_infl = f"{results_dir}/results_MISinfluence_{config.task}_{config.n}_{config.method.num_epoch}_{config.alpha}.pt"
     torch.save(influence_ls, results_path_infl)
-    results_path_MIS = f"{results_dir}/results_MIS_{config.task}_{config.n}_{config.method.arnoldi.n_it}_{config.alpha}.pt"
+    results_path_MIS = f"{results_dir}/results_MIS_{config.task}_{config.n}_{config.method.num_epoch}_{config.alpha}.pt"
     torch.save(MIS, results_path_MIS)
     print("Results outputed to: ", results_path_MIS)
 
