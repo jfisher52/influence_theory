@@ -66,10 +66,10 @@ This is a subset of the huggingface WikiText103 by [Merity et. al. 2016]{https:/
 
 ## Experimental Pipeline (Convex Experiments)
 Experimental code for both of the simulations (linear and logistic regression) and both of the economic experiments (Oregon Medicaid and Cash Transfer) can be found in the `convex_exp` folder. Each experiment is outlined in a juypter notebook and can be run by using the "Run All" function. Below is the folder location for each experiment.
-* Linear Regression: `convex exp\simulation\simulation_linear_exp.pdf`
-* Logistic Regression: `convex exp\simulation\simulation_logistic_exp.pdf`
-* Oregon Medicaid: `convex exp\economic_exp\oregon_medicaid.pdf`
-* Cash Transfer: `convex exp\economic_exp\cash_transfer.pdf`
+* Linear Regression: `convex exp\simulation\simulation_linear_exp.pdf` (run time: less than 1 minute)
+* Logistic Regression: `convex exp\simulation\simulation_logistic_exp.pdf` (run time: approximately 15 minute)
+* Oregon Medicaid: `convex exp\economic_exp\oregon_medicaid.pdf` (run time: less than 5 minute)
+* Cash Transfer: `convex exp\economic_exp\cash_transfer.pdf` (run time: less than 1 minute)
 
 ## Experimental Pipeline (Non-Convex Experiments)
 For each dataset (zsRE and WikiText), the experimental pipeline is as follows:
