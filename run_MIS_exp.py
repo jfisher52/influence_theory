@@ -58,9 +58,9 @@ def run(config):
     te_raw_inpt = torch.load(
         base_dir+"/data/zsre_selected_test_raw_inpt.pt", map_location=config.device)
     te_raw_pred = torch.load(
-        base_dir+"/data/zsre_selected_test_raw_pred", map_location=config.device)
+        base_dir+"/data/zsre_selected_test_raw_pred.pt", map_location=config.device)
     te_tok_pred = torch.load(
-        base_dir+"/data/zsre_selected_test_tok_pred", map_location=config.device)
+        base_dir+"/data/zsre_selected_test_tok_pred.pt", map_location=config.device)
 
     test_data = Create_dataset(
         te_raw_inpt, te_tok_pred, te_raw_pred, tokenizer, config)
@@ -75,7 +75,7 @@ def run(config):
     # Compute eigenvalues and eigenvectors
     start_vector = [torch.randn_like(v).cpu()
                     for v in model_original.parameters()]
-    result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.num_epoch,
+    result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.num_epochs,
                           verbose=False)
     eigvals, eigvecs = distill(
         result, config.method.arnoldi.top_k, verbose=False)
@@ -114,9 +114,9 @@ def run(config):
 
 # Save Results
     results_dir = base_dir+config.results_dir
-    results_path_infl = f"{results_dir}/results_MISinfluence_{config.task}_{config.n}_{config.method.num_epoch}_{config.alpha}.pt"
+    results_path_infl = f"{results_dir}/results_MISinfluence_{config.task}_{config.n}_{config.method.num_epochs}_{config.alpha}.pt"
     torch.save(influence_ls, results_path_infl)
-    results_path_MIS = f"{results_dir}/results_MIS_{config.task}_{config.n}_{config.method.num_epoch}_{config.alpha}.pt"
+    results_path_MIS = f"{results_dir}/results_MIS_{config.task}_{config.n}_{config.method.num_epochs}_{config.alpha}.pt"
     torch.save(MIS, results_path_MIS)
     print("Results outputed to: ", results_path_MIS)
 

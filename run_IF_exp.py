@@ -63,25 +63,10 @@ def run(config):
     # Removed data
     # Only want to use 1 removed point at a time
     removed_dataloader = create_dataloader(train_data, 1)
-#-------------------------------------------------------------
-#     from src.utils import avg_grad
-#     param_influence = list(model_original.parameters())
-# #Loss over test set
-#     model_original.zero_grad()
-#     # test_loss = loss(test_dataloader,model_original,config.device)
-#     # test_grads = torch.autograd.grad(test_loss, param_influence)
-#     test_grads = avg_grad(test_dataloader, model_original,config.device, param_influence,config.task)
-#     if config.approx_method == 'cgd':
-#         # compute H^{-1} test_grad instead; deterministic method
-#         z_lst = [torch.zeros_like(v) for v in model_original.parameters()]
-#         IF, loss_results_1run = conjugate_gradient(z_lst, test_grads, model_original, config.device, 
-#                             train_dataloader, config.regularization_param, config.method.conjugate_grad.eps,
-#                             config.method.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
 
-#-----------------------------------------------------------------------------------------------------
     # Get eigenvalues and eignevectors if using Arnoldi approx (only need to find this once)
-    logging.info("Start Eigenvalue/Eigenvector Calculations for Arnoldi Method")
     if config.approx_method == 'arnoldi':
+        logging.info("Start Eigenvalue/Eigenvector Calculations for Arnoldi Method")
         start_vector = [torch.randn_like(v).cpu()
                         for v in model_original.parameters()]
         result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.num_epochs,
@@ -120,13 +105,7 @@ def run(config):
         else:
             logging.error("Approximation Method is Invalid")
             break
-    # ----------------------------------------------
-    #     if config.approx_method == "cgd":
-    #         print("Using precomputed inf for CG")
-    #         loss_removed_pt = multi_loss_fn(model_original,rd, task="wiki")
-    #         grad_loss_removed_pt = torch.autograd.grad(loss_removed_pt, model_original.parameters())
-    #         influence = torch.dot(IF, gather_flat_grad(grad_loss_removed_pt)).item()
-    #-------------------------------------------
+        
         logging.info(f"Iterations Completed: {count}")
         # Compute IF over test set
         param_influence = list(model_original.parameters())
@@ -149,6 +128,7 @@ def run(config):
         results = {'logs': logs, 'loss': loss_results}
         if count >= config.iterations:
             break
+        logging.info(f"Influence: {influence}")
     # Save Results
     results_dir = base_dir+config.results_dir
     results_path = f"{results_dir}/results_{config.task}_{config.n}_{config.approx_method}_{config.method.num_epochs}_{config.method.regularization_param}.pt"
