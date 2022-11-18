@@ -1,16 +1,15 @@
-"""Config file to find approximated IF using certain approximation method (run_IF_exp.py)
-"""
-results_dir: "/results/zsre"
+# Config file to find approximated IF using certain approximation method (run_IF_exp.py)
+results_dir: "/results/wiki"
 hyperparam_search: False
 break_early: False # Use if you want to run less than one epoch
 task: "wiki"
 device: cuda:1
-n: 31 # either "all" = all data or an integer < len(train_data)
+n: 1903 # either "all" = all data or an integer < len(train_data)
 n_test: 200 # either "all" = all data or an integer < len(test_data)
-approx_method: cg
-tr_bsz: 4
-te_bsz: 32
-iterations: 1
+approx_method: svrg
+tr_bsz: 1
+te_bsz: 2
+iterations: 5
 
 # Model parameters
 dropout: 0.0
@@ -20,21 +19,41 @@ data_seed: 1
 
 # Method parameters
 method:
-  lambda1: 100
-  loss_at_epoch: False
-  cgd:
-    it_max: 100
+  lr: 1e-6
+  num_epochs: 25
+  regularization_param: 1
+  loss_at_epoch: True
+  conjugate_grad:
     eps: .01
-  sgd:
-    lr: 5e-4
-    num_epochs: 50
   arnoldi:
-    n_it: 30
-    top_k: 30
-  svrg:
-    lr: 5e-4
-    num_epochs: 25
+    top_k: 10
 
+model:
+  # name: facebook/bart-base
+  # class_name: BartForConditionalGeneration
+  # tokenizer_class: BartTokenizerFast
+  # tokenizer_name: facebook/bart-base
+  # inner_params:
+  # - model.encoder.layers.4.fc1.weight
+  # - model.encoder.layers.4.fc2.weight
+  # - model.encoder.layers.5.fc1.weight
+  # - model.encoder.layers.5.fc2.weight
+  # - model.decoder.layers.4.fc1.weight
+  # - model.decoder.layers.4.fc2.weight
+  # - model.decoder.layers.5.fc1.weight
+  # - model.decoder.layers.5.fc2.weight
+  # pt: "/models/zsre/model_zsre_1_49_200"
+  # pt: null
 
-
-
+  name: MYX4567/distilgpt2-finetuned-wikitext2
+  class_name: GPT2LMHeadModel
+  tokenizer_class: GPT2TokenizerFast
+  tokenizer_name: distilgpt2
+  inner_params:
+  - transformer.h.3.mlp.c_fc.weight
+  - transformer.h.3.mlp.c_proj.weight
+  - transformer.h.4.mlp.c_fc.weight
+  - transformer.h.4.mlp.c_proj.weight
+  - transformer.h.5.mlp.c_fc.weight
+  - transformer.h.5.mlp.c_proj.weight
+  pt: "/models/wiki/model_wiki_1_1903_200"

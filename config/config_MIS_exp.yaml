@@ -1,8 +1,8 @@
 # Config file to find approximated MIS on zsRE using arnoldi method (run_MIS_exp.py)
 results_dir: "results/zsre/MIS/"
 hyperparam_search: False
-task: "zsre"
-device: cuda:3
+task: "wiki"
+device: cuda:0
 n: 4499 # either "all" = all data or an integer < len(train_data)
 n_test: 100 # either "all" = all data or an integer < len(test_data)
 approx_method: arnoldi
@@ -18,12 +18,40 @@ data_seed: 1
 
 # Method parameters
 method:
+  regularization_param: 100
+  num_epochs: 50
   arnoldi:
-    n_it: 50
-    lambda1: 100
     top_k: 10
 
+model:
+#   name: facebook/bart-base
+#   class_name: BartForConditionalGeneration
+#   tokenizer_class: BartTokenizerFast
+#   tokenizer_name: facebook/bart-base
+#   inner_params:
+#   - model.encoder.layers.4.fc1.weight
+#   - model.encoder.layers.4.fc2.weight
+#   - model.encoder.layers.5.fc1.weight
+#   - model.encoder.layers.5.fc2.weight
+#   - model.decoder.layers.4.fc1.weight
+#   - model.decoder.layers.4.fc2.weight
+#   - model.decoder.layers.5.fc1.weight
+#   - model.decoder.layers.5.fc2.weight
+#   pt: "/models/zsre/model_zsre_1_49_200"
+  # pt: null
 
+  name: MYX4567/distilgpt2-finetuned-wikitext2
+  class_name: GPT2LMHeadModel
+  tokenizer_class: GPT2TokenizerFast
+  tokenizer_name: distilgpt2
+  inner_params:
+  - transformer.h.3.mlp.c_fc.weight
+  - transformer.h.3.mlp.c_proj.weight
+  - transformer.h.4.mlp.c_fc.weight
+  - transformer.h.4.mlp.c_proj.weight
+  - transformer.h.5.mlp.c_fc.weight
+  - transformer.h.5.mlp.c_proj.weight
+  pt: "/models/wiki/model_wiki_1_40_200"
 
 
 

@@ -1,12 +1,12 @@
 # Config file to finetune base model on zsRE or WikiText (run_train_model.py)
-results_dir: "/models/zsre"
-saved_model_dir: "/models/zsre"
+results_dir: "/models/wiki"
+saved_model_dir: "/models/wiki"
 hyperparam_search: False
-task: "zsre"
-iterations: 20
-n: 743 # either "all" = all data or an integer < len(train_data)
+task: "wiki"
+iterations: 50
+n: 275 # either "all" = all data or an integer < len(train_data)
 n_test: 200 # either "all" = all data or an integer < len(test_data)
-batch_size: 16
+batch_size: 4
 device: cuda:0
 
 # Model parameters
@@ -15,5 +15,35 @@ model_seed: 0
 data_seed: 1
 
 ft:
-  lr: 1e-6
+  lr: 1e-5
 
+model:
+  # name: facebook/bart-base
+  # class_name: BartForConditionalGeneration
+  # tokenizer_class: BartTokenizerFast
+  # tokenizer_name: facebook/bart-base
+  # inner_params:
+  # - model.encoder.layers.4.fc1.weight
+  # - model.encoder.layers.4.fc2.weight
+  # - model.encoder.layers.5.fc1.weight
+  # - model.encoder.layers.5.fc2.weight
+  # - model.decoder.layers.4.fc1.weight
+  # - model.decoder.layers.4.fc2.weight
+  # - model.decoder.layers.5.fc1.weight
+  # - model.decoder.layers.5.fc2.weight
+  # # pt: "/models/zsre/model_zsre_1_743_200"
+  # pt: null
+
+  name: MYX4567/distilgpt2-finetuned-wikitext2
+  class_name: GPT2LMHeadModel
+  tokenizer_class: GPT2TokenizerFast
+  tokenizer_name: distilgpt2
+  inner_params:
+  - transformer.h.3.mlp.c_fc.weight
+  - transformer.h.3.mlp.c_proj.weight
+  - transformer.h.4.mlp.c_fc.weight
+  - transformer.h.4.mlp.c_proj.weight
+  - transformer.h.5.mlp.c_fc.weight
+  - transformer.h.5.mlp.c_proj.weight
+  # pt: "/models/wiki/model_wiki_1_724_200"
+  pt: null
