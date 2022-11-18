@@ -13,7 +13,7 @@ def generate_theta_star(dim):
 # ---------------------------------LINEAR REGRESSION FUNCTIONS---------------------------
 # Simulate training data for linear simulation
 def sim_data_lin(dim, eps, n, rng, theta_star):
-    b = np.random.binomial(size=n, n=1, p=eps)  # (n,)
+    b = rng.binomial(size=n, n=1, p=eps)  # (n,)
     # Normalize by dimension to small norm
     x = rng.normal(0, 1, size=(n, dim)) / dim  # (n, d)
     mu = (1-b) * rng.normal(0, 1, size=n) + b * \
@@ -29,12 +29,11 @@ def sim_contaminated_lin(dim, n, rng, theta_star):
     return x, y
 
 # Runs n_sim number of simulations computing population and empirical IF on one contaminated point
-def if_diff_sim_lin(dim, x_sim, y_sim, oracle_theta_dict, lambda_, n, n_sim, seed, theta_star, if_emp, if_pop):
+def if_diff_sim_lin(dim, x_sim, y_sim, oracle_theta_dict, lambda_, n, n_sim, rng2, theta_star, if_emp, if_pop):
     oracle_theta = oracle_theta_dict[lambda_]
     if_emp_ls = []
     if_pop_ls = []
-    rng = np.random.RandomState(seed)
-    x_con_ls, y_con_ls = sim_contaminated_lin(dim, n_sim, rng, theta_star)
+    x_con_ls, y_con_ls = sim_contaminated_lin(dim, n_sim, rng2, theta_star)
     for i in range(n_sim):
         x_con = x_con_ls[i]
         y_con = y_con_ls[i]
@@ -49,11 +48,12 @@ def run_sim_lin(n_sim, eps, n_ls, lambda_ls, oracle_theta_dict, dim, seed, theta
     n_samp = []
     lambda_ = []
     rng = np.random.RandomState(1)
+    rng2 = np.random.RandomState(2)
     for n in n_ls:
         x_sim, y_sim = sim_data_lin(dim, eps, n, rng, theta_star)
         for l in lambda_ls:
             if_emp_ls, if_pop_ls = if_diff_sim_lin(
-                dim, x_sim, y_sim, oracle_theta_dict, l, n, n_sim, seed, theta_star, if_emp, if_pop)
+                dim, x_sim, y_sim, oracle_theta_dict, l, n, n_sim, rng2, theta_star, if_emp, if_pop)
             bound_val = []
             for i in range(len(if_emp_ls)):
                 diff_abs_total = np.abs(if_emp_ls[i]-if_pop_ls[i])
@@ -68,7 +68,7 @@ def run_sim_lin(n_sim, eps, n_ls, lambda_ls, oracle_theta_dict, dim, seed, theta
 # ---------------------------------LOGISTIC REGRESSION FUNCTIONS---------------------------
 # Simulate training data for logistic simulation
 def sim_data_log(dim, eps, n, rng, theta_star):
-    b = np.random.binomial(size=n, n=1, p=eps)
+    b = rng.binomial(size=n, n=1, p=eps)
     # Normalize by dimension to small norm
     x = rng.normal(0, 1, size=(n, dim)) / dim  # (n, d)
     mu = (1-b) * rng.normal(0, 1, size=n) + b * \
@@ -108,6 +108,7 @@ def run_sim_log(dim, eps, n_pop, n_ls, n_sim, emp_if_fn, theta_star):
 
     rng = np.random.RandomState(1)
     rng2 = np.random.RandomState(2)
+    rng3 = np.random.RandomState(3)
 
     # Get population sample
     y_pop = {}
@@ -120,7 +121,7 @@ def run_sim_log(dim, eps, n_pop, n_ls, n_sim, emp_if_fn, theta_star):
         while set(y_sim) != {0, 1}:
             x_sim, y_sim = sim_data_log(dim, eps, n, rng, theta_star)
         if_emp_ls, if_pop_ls, H_pop = if_diff_sim_log(
-            dim, x_sim, y_sim, x_pop, y_pop, n_sim, rng, theta_star, emp_if_fn)
+            dim, x_sim, y_sim, x_pop, y_pop, n_sim, rng3, theta_star, emp_if_fn)
         bound_val = []
         for i in range(len(if_emp_ls)):
             diff_abs_total = np.abs(if_emp_ls[i]-if_pop_ls[i])
