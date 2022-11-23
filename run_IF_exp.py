@@ -44,7 +44,8 @@ def run(config):
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
     if config.task == 'wiki':
         tokenizer.pad_token = tokenizer.eos_token
-    model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
+    model_original = get_model(tokenizer, config.model.name, transformers,
+                               config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
 
     # Download train/test data
     if config.task == "zsre":
@@ -66,7 +67,8 @@ def run(config):
 
     # Get eigenvalues and eignevectors if using Arnoldi approx (only need to find this once)
     if config.approx_method == 'arnoldi':
-        logging.info("Start Eigenvalue/Eigenvector Calculations for Arnoldi Method")
+        logging.info(
+            "Start Eigenvalue/Eigenvector Calculations for Arnoldi Method")
         start_vector = [torch.randn_like(v).cpu()
                         for v in model_original.parameters()]
         result = arnoldi_iter(start_vector, model_original, config.device, train_dataloader,  config.method.regularization_param, config.method.num_epochs,
@@ -105,7 +107,7 @@ def run(config):
         else:
             logging.error("Approximation Method is Invalid")
             break
-        
+
         logging.info(f"Iterations Completed: {count}")
         # Compute IF over test set
         param_influence = list(model_original.parameters())

@@ -43,7 +43,8 @@ def run(config):
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
     if config.task == 'wiki':
         tokenizer.pad_token = tokenizer.eos_token
-    model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
+    model_original = get_model(tokenizer, config.model.name, transformers,
+                               config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
 
     # Download zsRE data set
     logging.info("Create train/test datasets")
@@ -87,7 +88,6 @@ def run(config):
     grad_loss_test_ls = []
     for i, te in enumerate(test_dataloader):
         print(i)
-        logs = []
         # Loss over test set
         model_original.zero_grad()
         loss_test_pt = multi_loss_fn(model_original, te, config.task)
@@ -97,6 +97,7 @@ def run(config):
     logging.info("Start Training Point Influence")
     # Find influence of each train_pt on each test_pt
     for j, grad_te in enumerate(grad_loss_test_ls):
+        logs = []
         for rd in removed_dataloader:
             # Loss over removed point (training point)
             loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
@@ -106,10 +107,12 @@ def run(config):
             # Find influence of 1 training point on 1 test point
             influence = compute_influence_on_loss(
                 grad_loss_removed_pt, grad_te, eigvals, eigvecs)
-            logs.append(influence)
+            # Need to multiply by negative 1 (for superquantile formula)
+            logs.append(-1*influence)
         logging.info("Complete one test point")
         MIS.append(reduce_superquantile(torch.tensor(logs),
                    superquantile_tail_fraction=1-config.alpha))
+        logging.info(f"MIS: {MIS}")
         influence_ls[j] = torch.tensor(logs)
 
 # Save Results

@@ -26,6 +26,7 @@ OmegaConf.register_new_resolver("uuid", lambda: utils.uuid())
 # Set default to float64
 torch.set_default_dtype(torch.float64)
 
+
 @hydra.main(config_path='config', config_name='config_train_model')
 def run(config):
     logging.info(f"Configuration: {config}")
@@ -43,7 +44,8 @@ def run(config):
         config.model.tokenizer_name, config.model.name, config.model.tokenizer_class)
     if config.task == 'wiki':
         tokenizer.pad_token = tokenizer.eos_token
-    model_original = get_model(tokenizer, config.model.name, transformers, config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
+    model_original = get_model(tokenizer, config.model.name, transformers,
+                               config.model.class_name, config.model.pt, config.dropout, base_dir).to(config.device)
 
     # Download train/test data
     if config.task == "zsre":
