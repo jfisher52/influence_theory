@@ -22,7 +22,7 @@ def training(args, model_original, tokenizer, train_data, test_data, base_dir, l
     # Set device and model
     device = args.device
     model_ft = copy.deepcopy(model_original).to(device)
-    
+
     # Evaluate original model
     logs = [evaluate_models_fn(
         args, model_ft, tokenizer, train_data, test_data)]

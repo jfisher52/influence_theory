@@ -45,7 +45,8 @@ class Create_dataset(torch.utils.data.Dataset):
         return dict_to(data_inner, self.config.device)
 
     def _tokenize(self, data_inpt):
-        tok_inpt=self.tok(data_inpt, padding=True, return_tensors="pt",truncation=False, max_length=100)
+        tok_inpt = self.tok(data_inpt, padding=True,
+                            return_tensors="pt", truncation=False, max_length=100)
         tok_inpt['labels'] = self.get_edit_labels(tok_inpt["input_ids"])
 
         dataset = []
@@ -53,6 +54,7 @@ class Create_dataset(torch.utils.data.Dataset):
         for ii, iam, lb in zip(tok_inpt['input_ids'], tok_inpt['attention_mask'], tok_inpt['labels']):
             dataset.append(dict(zip(keys, [ii, iam, lb])))
         return dataset
+
 
 def extract_data_wiki(config, tokenizer, base_dir):
     # Extract Subset of Training Set

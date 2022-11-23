@@ -83,8 +83,15 @@ def sgd(target, model, device, train_loader,  regularization_param, lr, num_epoc
                 break
         if loss_at_epoch:
             epoch_loss_val = epoch_loss(
-                x, train_loader, model, device, target, regularization_param, task=task)
+                x, train_loader, model, device, target, regularization_param, task=task).item()
+            print("\t", ep+1, epoch_loss_val)
             loss.append(epoch_loss_val)
+            if epoch_loss_val > 1e4 or np.isnan(epoch_loss_val):
+                logging.info("Loss very large. Quitting training here")
+                break
+            if epoch_loss_val < -1e3:
+                logging.info("Loss is unbounded below. Quitting training here")
+                break
         logging.info(f"Epochs Completed: {ep}")
     loss_total = epoch_loss(x, train_loader, model,
                             device, target, regularization_param, task=task)
@@ -271,6 +278,7 @@ def variance_reduction(target, model, device, train_loader, regularization_param
     logging.info(f"Number of Epochs: {num_epochs}")
     logging.info(f"Learning Rate: {lr}")
     logging.info(f"regularization_param: {regularization_param}")
+
     def batch_gradient_fn(X):
         HX = avg_hvp(train_loader, model, X, device)
         return [hx + regularization_param * x - v0 for (hx, x, v0) in zip(HX, X, target)]
@@ -296,7 +304,7 @@ def variance_reduction(target, model, device, train_loader, regularization_param
             epoch_loss_val = epoch_loss(
                 X, train_loader, model, device, target, regularization_param, task=task)
             loss.append(epoch_loss_val)
-            print(epoch_loss_val)
+            print("Function Loss: ", epoch_loss_val)
         logging.info(f"Epochs Completed: {ep}")
     loss_total = epoch_loss(X, train_loader, model,
                             device, target, regularization_param, task=task)

@@ -19,8 +19,9 @@ def get_model(tokenizer, model_name, transformers, model_class_name, model_pt, d
     logging.info(
         f"Loading model class {ModelClass} with name {model_name} from cache dir {scr()}")
     if model_class_name == "GPT2LMHeadModel":
-        model = ModelClass.from_pretrained(model_name, pad_token_id=tokenizer.eos_token_id, cache_dir=scr())
-    else: 
+        model = ModelClass.from_pretrained(
+            model_name, pad_token_id=tokenizer.eos_token_id, cache_dir=scr())
+    else:
         model = ModelClass.from_pretrained(model_name, cache_dir=scr())
 
     if model_pt is not None:
@@ -71,8 +72,6 @@ def get_tokenizer(model_tokenizer_name, model_name, model_tokenizer_class):
 # ---------------------------------------------------------------------------
 
 # Creates dictionary
-
-
 def dict_to(d, device):
     new_dict = {}
     for k, v in d.items():
@@ -97,8 +96,6 @@ def unflatten_to_param_dim(x, param_shape_tensor):
     return tar_p
 
 # Code from https://github.com/xhan77/influence-function-analysis/blob/78d5a967aba885f690d34e88d68da8678aee41f1/bert_util.py#L336
-
-
 def gather_flat_grad(grads):
     views = []
     for p in grads:
@@ -110,8 +107,6 @@ def gather_flat_grad(grads):
     return torch.cat(views, 0)
 
 # Average gradient of loss function
-
-
 def avg_grad(data, model, device, param_influence, task):
     # Initialize correctly on the right device
     grad_all = [torch.zeros_like(v) for v in model.parameters()]
@@ -126,8 +121,6 @@ def avg_grad(data, model, device, param_influence, task):
     return grad_all
 
 # Hessian vector product over one batch
-
-
 def hvp_fn(model, loss, multiplier):
     grad = torch.autograd.grad(loss, model.parameters(), create_graph=True)
     gnorm = 0
@@ -137,8 +130,6 @@ def hvp_fn(model, loss, multiplier):
     return [h.detach() for h in hvp]
 
 # Hessian vector product average over batches
-
-
 @torch.enable_grad()
 def avg_hvp(data, model, multiplier, device, task='zsre', break_early=False):
     # Initialize correctly on the right device
@@ -156,19 +147,17 @@ def avg_hvp(data, model, multiplier, device, task='zsre', break_early=False):
     return hvp_all
 
 # Epoch loss for SGD, SVRG, and Conjugate Gradient
-def epoch_loss(ihvp, train_loader, model, device, target, regularization_param, task='zsre'):
-    # .5X^T H X + X^T regularization_param X - VX
-    t1 = .5 * (torch.dot(gather_flat_grad(ihvp),
-               gather_flat_grad(avg_hvp(train_loader, model, ihvp, device, task=task))))
-    t2 = .5 * regularization_param * \
-        torch.dot(gather_flat_grad(ihvp), gather_flat_grad(ihvp))
-    t3 = torch.dot(gather_flat_grad(target), gather_flat_grad(ihvp))
-    loss = t1 + t2 - t3
-    return (loss)
+def epoch_loss(ihvp, train_loader, model, device, target, regularization_param=0.0, task="zsre"):
+    hvp = avg_hvp(train_loader, model, ihvp, device, task=task)
+    t1 = 0.5 * sum(torch.dot(a.view(-1), b.view(-1))
+                   for a, b in zip(ihvp, hvp))
+    t2 = sum(torch.dot(a.view(-1), b.view(-1)) for a, b in zip(target, ihvp))
+    t3 = 0.5 * regularization_param * \
+        sum(torch.dot(v.view(-1), v.view(-1)) for v in ihvp)
+    loss = t1 - t2 + t3
+    return loss
 
 # Epoch loss for arnoldi
-
-
 def arnoldi_loss(eigvecs, eigvals, target):
     # -.5 V^TU \lambda U^TV
     grad = []
@@ -184,8 +173,6 @@ def arnoldi_loss(eigvecs, eigvals, target):
     return torch.dot(gather_flat_grad(proj_grad), inverse_hessian_diag * gather_flat_grad(proj_grad))
 
 # Create pytorch dataloader
-
-
 def create_dataloader(data, batch_size):
     dataloader = torch.utils.data.DataLoader(
         dataset=data, batch_size=batch_size, shuffle=False)
