@@ -27,7 +27,7 @@ class Create_dataset(torch.utils.data.Dataset):
         if (ids[:, 0] == self.tok.pad_token_id).any():
             raise ValueError("Left-padding not supported for GPT2")
 
-    def get_edit_labels(self, ids):
+    def get_wiki_labels(self, ids):
         self._check_padding(ids)
 
         labels = ids.clone()
@@ -47,7 +47,7 @@ class Create_dataset(torch.utils.data.Dataset):
     def _tokenize(self, data_inpt):
         tok_inpt = self.tok(data_inpt, padding=True,
                             return_tensors="pt", truncation=False, max_length=100)
-        tok_inpt['labels'] = self.get_edit_labels(tok_inpt["input_ids"])
+        tok_inpt['labels'] = self.get_wiki_labels(tok_inpt["input_ids"])
 
         dataset = []
         keys = ['inpt_input_ids', 'inpt_attention_mask', 'labels']
