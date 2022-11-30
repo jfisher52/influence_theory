@@ -1,6 +1,6 @@
 # Run all WikiText approxmiation of influence function experiements
 # Set parameters
-lr=(1e-2 1e-2 5e-3 5e-3)
+lr=(1e-2 1e-2 1e-3 1e-3)
 num_epochs=(100 50 25 50)
 method=(conjugate_gradient sgd svrg arnoldi)
 n=(40 105 275 724 1903)
