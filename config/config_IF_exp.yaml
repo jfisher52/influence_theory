@@ -4,7 +4,7 @@ hyperparam_search: False
 break_early: False # Use if you want to run less than one epoch
 task: "wiki"
 device: cuda:1
-n: 1903 # either "all" = all data or an integer < len(train_data)
+n: 105 # either "all" = all data or an integer < len(train_data)
 n_test: 200 # either "all" = all data or an integer < len(test_data)
 approx_method: svrg
 tr_bsz: 1
@@ -19,7 +19,7 @@ data_seed: 1
 
 # Method parameters
 method:
-  lr: 1e-6
+  lr: 1e-3
   num_epochs: 25
   regularization_param: 1
   loss_at_epoch: True
