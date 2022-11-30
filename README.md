@@ -20,7 +20,7 @@ as well as computational complexity bounds for influence functions and
 approximate maximum influence perturbations using efficient inverse-Hessian-vector 
 product implementations.
 
-In this repo, we provide code which computes the influence function and most influential subsets for two transformer language model experiments. We also provide the code which computes the influence functions for two linear models with both synthetic and economic data.
+In this repo, we provide code which computes the influence function and most influential subsets for two transformer language model experiments. We also provide the code which computes the influence function for two linear models with both synthetic and economic data.
 
 ## Dependencies
 The code is written in Python and the dependencies are:
@@ -51,11 +51,11 @@ All the data for the two non-convex (language model) experiments can be download
 
 **1. Zero Shot Relations Extraction (zsRE)**
 
-We used a subset of the zsRE data originally collected by [Levy et. al. 2017]{http://nlp.cs.washington.edu/zeroshot/}. The zsRE data consists of an input question $x_i$, and target answer $y_i$. 
+We used a subset of the zsRE data originally collected by [Levy et. al. 2017](http://nlp.cs.washington.edu/zeroshot/). The zsRE data consists of an input question $x_i$, and target answer $y_i$. 
 
 **2. WikiText**
 
-This is a subset of the WikiText103 by [Merity et. al. 2016]{https://arxiv.org/abs/1609.07843}. The WikiText data has a paragraph as the input $x_i$ and the next 10 token continuation as the output $y_i$.
+This is a subset of the WikiText103 by [Merity et. al. 2016](https://arxiv.org/abs/1609.07843). The WikiText data has a paragraph as the input $x_i$ and the next 10 token continuation as the output $y_i$.
 
 ### Convex Experiments
 
@@ -75,7 +75,7 @@ This data is provided free by the National Bureau of Economic Research. However,
 
 Place both data files under the folder `convex_exp/data/oregon_data` 
 
-Citation: Oregon Health Insurance Experiment Web Page is available at www.nber.org/oregon
+Citation: Oregon Health Insurance Experiment Web Page is available at [here](www.nber.org/oregon)
 
 ## Experimental Pipeline (Convex Experiments)
 Experimental code for both of the simulations (linear and logistic regression) and both of the economic experiments (Oregon Medicaid and Cash Transfer) can be found in the `convex_exp` folder. Each experiment is outlined in a juypter notebook and can be run by using the "Run All" function. Below is the folder location for each experiment.
@@ -122,4 +122,4 @@ NEED TO ADD
 ```
     
 ## Acknowledgements
-This work was supported by the Institute for Foundations of Data Science. ASK ZAID ABOUT OTHERS!!!!!
+This work was supported by NSF DMS-2023166, NSF CCF-2019844, NSF DMS-2052239, PIMS CRG (PIHOT), NSF DMS-2134012, CIFAR-LMB, and faculty research awards.
