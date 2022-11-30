@@ -11,8 +11,9 @@ for some $\epsilon > 0$.
 Using these definitions, we approximate the influence function as
 $$I_n(z) := \frac{\theta_{n,\epsilon,z} - \theta_n}{\epsilon} \approx \frac{d\theta_{n,\epsilon,z}}{d\epsilon}\vert_{\epsilon = 0}$$
 
-![Influence of a Datapoint](influence_function_visual.png)
-
+<p align="center">
+<img src="influence_function_visual.png" width="275">
+</p>
 
 In this paper we establish finish-sample statistical bounds under self-concordance, 
 as well as computational complexity bounds for influence functions and 
