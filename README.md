@@ -118,7 +118,13 @@ This should take about 14 hours for the zsRE experiment.
 ## Citation
 If you find this repository useful, or you use it in your research, please cite:
 ```
-NEED TO ADD
+ @article{fisher_liu_pillutla_choi_harchaoui_2022, 
+ title={Statistical and Computational Guarantees for Influence Diagnostics}, 
+ author={Fisher, Jillian and Liu, Lang and Pillutla, Krishna and Choi, Yejin and Harchaoui, Zaid}, 
+ journal={arXiv preprint}
+ year={2022}, 
+ month={Dec}
+ } 
 ```
     
 ## Acknowledgements
