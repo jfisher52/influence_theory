@@ -1,6 +1,6 @@
 # Influence Theory 
-This repository contains the code and the scripts to reproduce the experiments 
-[in this paper](NEED TO ADD LINK). 
+This repository contains the code and the scripts to reproduce the experiments the paper
+[Statistical and Computational Guarantees for Influence Diagnostics](https://arxiv.org/abs/2212.04014). 
 
 **Influence functions** quantify the influence of a fixed data point $z$ on an etimator $\theta_n$. 
 Given an estimator $$\theta_n := \arg \min_{\theta \in \Theta} \sum_{i=1}^n \ell (z_i, \theta),$$ where 
@@ -122,6 +122,7 @@ If you find this repository useful, or you use it in your research, please cite:
  title={Statistical and Computational Guarantees for Influence Diagnostics}, 
  author={Fisher, Jillian and Liu, Lang and Pillutla, Krishna and Choi, Yejin and Harchaoui, Zaid}, 
  journal={arXiv preprint}
+ url = {https://arxiv.org/abs/2212.04014},
  year={2022}, 
  month={Dec}
  } 
