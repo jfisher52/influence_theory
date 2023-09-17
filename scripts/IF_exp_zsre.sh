@@ -2,7 +2,7 @@
 # Set parameters
 lr=(5e-4 5e-4 5e-4 5e-4)
 num_epochs=(100 50 25 30)
-method=(conjugate_gradient sgd svrg arnoldi)
+method=(conjugate_gradient sgd svrg arnoldi identity)
 n=(49 122 182 302 743 4499)
 
 # Run experiements
