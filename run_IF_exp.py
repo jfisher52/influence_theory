@@ -13,7 +13,7 @@ from src.utils import get_tokenizer, get_model, create_dataloader, avg_grad, arn
 from src.data_zsre import extract_data_zsre
 from src.data_wiki import extract_data_wiki
 from src.loss_functions import multi_loss_fn
-from src.approximation_alg import conjugate_gradient, sgd, arnoldi_iter, distill, variance_reduction, compute_influence_on_loss
+from src.approximation_alg import conjugate_gradient, sgd, identity, arnoldi_iter, distill, variance_reduction, compute_influence_on_loss
 
 
 # Set directoryP
@@ -103,6 +103,12 @@ def run(config):
             grad_loss_removed_pt = torch.autograd.grad(
                 loss_removed_pt, model_original.parameters())
             IF, loss_results_1run = sgd(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.regularization_param,
+                                        config.method.lr, config.method.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
+        elif config.approx_method == 'identity':
+            loss_removed_pt = multi_loss_fn(model_original, rd, config.task)
+            grad_loss_removed_pt = torch.autograd.grad(
+                loss_removed_pt, model_original.parameters())
+            IF, loss_results_1run = identity(grad_loss_removed_pt, model_original, config.device, train_dataloader, config.method.regularization_param,
                                         config.method.lr, config.method.num_epochs, config.task, config.method.loss_at_epoch, config.break_early)
         else:
             logging.error("Approximation Method is Invalid")
