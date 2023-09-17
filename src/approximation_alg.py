@@ -5,6 +5,22 @@ from src.utils import avg_hvp, hvp_fn, multi_loss_fn, gather_flat_grad, epoch_lo
 import numpy as np
 import logging
 
+# Identity
+def identity(target, model, device, train_loader, regularization_param, eps, it_max, task='zsre', loss_at_epoch=False, break_early=False):
+    """Applies the identity matrix as the Hessian.
+    Args:
+        target: Vector multiplied by inverse hessian (gradient of loss at the point of interest).
+    Returns:
+        The result of using the identity matrix as the Hessian, resulting in an approximation for H^{-1}(target).
+    """
+    logging.info(f"Using the identity as the hessian")
+    # x = I^{-1} grad_loss = grad_loss
+    x = target
+    # track loss
+    loss = epoch_loss(x, train_loader, model,
+                                device, target, regularization_param, task=task)
+
+    return gather_flat_grad(x), loss
 
 # Conjugate Gradient
 def conjugate_gradient(x_init, target, model, device, train_loader, regularization_param, eps, it_max, task='zsre', loss_at_epoch=False, break_early=False):
@@ -85,9 +101,13 @@ def sgd(target, model, device, train_loader,  regularization_param, lr, num_epoc
             loss_list.append(epoch_loss_val)
             if epoch_loss_val > 1e4 or np.isnan(epoch_loss_val):
                 logging.info("Loss very large. Quitting training here")
+                print("Loss very large. Quitting training here")
+
                 break
             if epoch_loss_val < -1e3:
                 logging.info("Loss is unbounded below. Quitting training here")
+                print("Loss is unbounded below. Quitting training here")
+
                 break
         logging.info(f"Epochs Completed: {ep}")
     loss_total = epoch_loss(x, train_loader, model,
